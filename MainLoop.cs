@@ -10,10 +10,6 @@ namespace StudentRegistrationSystem
             RunCommandLoop();
         }
 
-        public static void RunCommandLoop()
-        {
-            //get input & direct accordingly
-        }
         public static void CreateLists()
         {
             //create lists
@@ -22,17 +18,50 @@ namespace StudentRegistrationSystem
         {
             //give info
         }
+        public static void RunCommandLoop()
+        {
+            //get input & direct accordingly
+
+            bool unrecognizedCommand = false;
+            do
+            {
+                unrecognizedCommand = false;
+                Console.Write("Komut Giriniz >> ");
+                string? komut = Console.ReadLine();
+
+                switch (komut)
+                {
+                    case "ogrencikaydet":
+                        RegisterStudent();
+                        break;
+                    case "ogrencinotgir":
+                        EnterGrades();
+                        break;
+                    case "listeyikaydet":
+                        SaveList();
+                        break;
+                    case "cikis":
+                        return;
+                    default:
+                        Console.WriteLine("\n >>> Tanınmayan komut!\n");
+                        unrecognizedCommand = true;
+                        break;
+                }
+            }
+            while (unrecognizedCommand);
+
+        }
 
 
-        public static void OgrenciKaydet()
+        public static void RegisterStudent()
         {
             //register student
         }
-        public static void OgrenciNotGir()
+        public static void EnterGrades()
         {
             //enter grades
         }
-        public static void ListeyiKaydet()
+        public static void SaveList()
         {
             //save lists
         }
