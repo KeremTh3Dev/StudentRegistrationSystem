@@ -45,3 +45,14 @@ namespace StudentRegistrationSystem
 
     }
 }
+
+/* 
+
+notlarım:
+
+
+ders ekle diye bir kısım da olmalı
+ogrenci notu girerken de bir loop;
+ders adı: not:
+
+*/

@@ -115,14 +115,33 @@ namespace StudentRegistrationSystem
             {
                 Console.WriteLine($"{student.StudentNo} no {student.Name} {student.Surname} adlı öğrencinin notu: {student.Grade}\n");
             }
-            System.Console.WriteLine("\n Devam etmek için herhangi bir tuşa basınız...");
-            Console.ReadLine();
-            Console.Clear();
+            
             while (true)
             {
-                Console.Write("Girilen bilgileri onaylıyor musunuz? (Y/N): ");
+                Console.Write("\n >> Girilen bilgileri düzenlemek istiyor musunuz? (Y/N): ");
                 string input = Console.ReadLine()?.Trim().ToLower() ?? "";
-//---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+                if(input == "y")
+                {
+                    //bilgileri düzenlet
+                }
+                else if(input == "n")
+                {
+                    Console.Clear();
+                    System.Console.WriteLine("Liste varsayılan olarak masaüstüne kaydedilecek, farklı bir dizin belirlemek ister misiniz? (Y/N)");
+                    string input1 = Console.ReadLine()?.Trim().ToLower() ?? "";
+                    if(input1 == "y")
+                    {
+                        //dizin sor ve o dizine kaydet.
+                    }
+                    else if(input1 == "n")
+                    {
+                        //desktopa kaydet
+                    }
+                }
+                else
+                {
+                    continue;
+                }
             }
         }
         public static void ThrowException()
@@ -130,6 +149,7 @@ namespace StudentRegistrationSystem
             Thread.Sleep(400); //waitfor 0.4s
             Console.WriteLine("\n >>> Tanınmayan komut!\n");
             Thread.Sleep(400); //waitfor 0.4s
+            Console.Clear();
         }
         public static void GiveInformation()
         {
