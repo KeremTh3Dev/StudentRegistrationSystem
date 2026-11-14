@@ -4,30 +4,33 @@ namespace StudentRegistrationSystem
     {
         public static void Run()
         {
-
-            Algorithm.GiveInformation();
-
+            Console.Clear();
+            Algorithm.Welcome();
             MainMenu();
-
         }
 
 
         public static void MainMenu()
         {
+            Console.Clear();
+            Algorithm.GiveInformation();
             bool unrecognizedCommand;
             do
             {
                 unrecognizedCommand = false;
                 Console.Write("Komut Giriniz >> ");
                 string? komut = Console.ReadLine();
-//-------------------------------------------------
+                //-------------------------------------------------
 
                 switch (komut)
                 {
                     case "ogrenciekle":
                         Algorithm.RegisterStudent();
                         break;
-                    case "cikis":
+                    case "notekle":
+                        Algorithm.EnterGrades();
+                        break;
+                    case "kaydetvecik":
                         Algorithm.SaveList();
                         return;
                     default:
