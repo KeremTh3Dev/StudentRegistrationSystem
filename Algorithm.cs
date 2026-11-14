@@ -1,22 +1,31 @@
-﻿
-namespace StudentRegistrationSystem
+﻿namespace StudentRegistrationSystem
 {
 
-
+    public class Course
+    {
+        public required string CourseName { get; set; }
+        public required string Ects { get; set; }
+    }
+    public class CourseGrade
+    {
+        public required Course Course { get; set; }
+        public required string Score { get; set; }
+    }
     public class Student
     {
         public required string Name { get; set; }
         public required string Surname { get; set; }
         public required string StudentNo { get; set; }
-        public string? Grade { get; set; }
+        public List<CourseGrade> Grades { get; set; } = new();
 
     }
+
 
 
     public static class Algorithm
     {
         public static List<Student> students = new List<Student>();
-
+        public static List<Course> courses = new List<Course>();
         public static void RegisterStudent()
         {
             Console.Clear();
@@ -25,7 +34,7 @@ namespace StudentRegistrationSystem
 
             while (true)
             {
-                string name, surname, studentNo; //grade;
+                string name, surname, studentNo;
                 while (true)
                 {
                     Console.Write("Öğrenci Adı: ");
@@ -107,16 +116,82 @@ namespace StudentRegistrationSystem
             }
         }
 
+        public static void RegisterCourse()
+        {
+            Console.Clear();
+            Console.WriteLine("\n--- Ders Kayıt Modu ---");
+            Console.WriteLine("Ana menüye dönmek için isim kısmına 'q' yazabilirsiniz.\n");
+
+            while (true)
+            {
+                string courseName, ects;
+
+                while (true)
+                {
+                    Console.Write("Ders Adı: ");
+                    courseName = Console.ReadLine()?.Trim() ?? "";
+
+                    if (courseName.ToLower() == "q")
+                    {
+                        Console.WriteLine(">>> Kayıt modundan çıkıldı.\n");
+                        Manage.MainMenu();
+                        return;
+                    }
+                    if (string.IsNullOrEmpty(courseName) || !courseName.All(char.IsLetter))
+                    {
+                        Console.WriteLine(">>> Geçersiz ad\n");
+                        continue;
+                    }
+                    break;
+                }
+                while (true)
+                {
+                    Console.Write("Ders kredisi: ");
+                    ects = Console.ReadLine()?.Trim() ?? "";
+
+                    if (ects.ToLower() == "q")
+                    {
+                        Console.WriteLine(">>> Kayıt modundan çıkıldı.\n");
+                        Manage.MainMenu();
+                        return;
+                    }
+                    if (string.IsNullOrEmpty(ects) || !int.TryParse(ects, out int parsedEcts) || parsedEcts < 1 || parsedEcts > 10)
+                    {
+                        Console.WriteLine(">>> Geçersiz ders kredisi\n");
+                        continue;
+                    }
+                    break;
+                }
+
+                Course newCourse = new Course
+                {
+                    CourseName = courseName,
+                    Ects = ects
+                };
+
+                courses.Add(newCourse);
+                Console.Clear();
+                Console.WriteLine("\n  >>> Ders başarıyla kaydedildi!\n");
+                Thread.Sleep(1500);
+                Console.Clear();
+                Console.WriteLine(" Sonraki dersin bilgileri:\n\n (cıkmak icin q basiniz)\n\n\n");
+            }
+        }
+
         //------------------------------------------------------------------------------------------------------------------------------U N D E R-------------------------------------------------------------------------------------------------------
         public static void SaveList()
         {
             Console.Clear();
             foreach (var student in students)
             {
-                Console.WriteLine($@"
-                {student.StudentNo} no {student.Name} {student.Surname} adlı öğrencinin notları:
-                Default ders notu: {student.Grade} 
-                "); //asıl derslerin notları da sırasıyla iterate etmeli ve notları öğrenciye göre girilmeli. ancak aradaki ForeignKey nasıl olucak... iki sınıfı birbirine bağlayan bir key.
+                Console.WriteLine($"{student.StudentNo} no {student.Name} {student.Surname} adlı öğrencinin notları:");
+
+                foreach (var g in student.Grades)
+                {
+                    Console.Write($"{g.Course.CourseName} ({g.Course.Ects} AKTS): {g.Score}   ");
+                }
+
+                Console.WriteLine("\n");
             }
 
             while (true)
@@ -160,7 +235,7 @@ namespace StudentRegistrationSystem
         }
         public static void GiveInformation()
         {
-            Console.WriteLine(" komutlar: ogrenciekle, notekle, kaydetvecik\n");
+            Console.WriteLine(" komutlar: ogrenciekle, dersekle, notekle, kaydetvecik\n");
         }
         public static void Welcome()
         {
@@ -177,34 +252,52 @@ namespace StudentRegistrationSystem
                 Console.WriteLine("\n\nÖncelikle en az 1 öğrenci kaydediniz.\n");
                 Thread.Sleep(3000);
                 Manage.MainMenu();
+                return;
+            }
+            if (courses.Count == 0)
+            {
+                Console.Clear();
+                Console.WriteLine("\n\nÖncelikle en az 1 ders kaydediniz.\n");
+                Thread.Sleep(3000);
+                Manage.MainMenu();
+                return;
             }
             else
             {
                 Console.Clear();
                 foreach (var student in students)
                 {
-                    while (true)
+                    student.Grades.Clear();
+
+                    foreach (var course in courses)
                     {
-                        Console.Write($"{student.Name} {student.Surname} ({student.StudentNo}no) adlı öğrencinin notu: ");
-                        string temporaryInput = Console.ReadLine() ?? "";
-
-                        if (temporaryInput?.ToLower() == "q")
+                        while (true)
                         {
-                            Console.WriteLine(">>> Kayıt modundan çıkıldı.\n");
-                            Manage.MainMenu();
-                            return;
-                        }
+                            Console.Write($"{student.Name} {student.Surname} ({student.StudentNo}no) - {course.CourseName} notu: ");
+                            string temporaryInput = Console.ReadLine() ?? "";
 
-                        if (string.IsNullOrEmpty(temporaryInput) || !int.TryParse(temporaryInput, out int parsedGrade) || parsedGrade < 0 || parsedGrade > 100)
-                        {
-                            Console.WriteLine("Geçersiz öğrenci notu!");
-                            Thread.Sleep(2000);
+                            if (temporaryInput?.ToLower() == "q")
+                            {
+                                Console.WriteLine(">>> Kayıt modundan çıkıldı.\n");
+                                Manage.MainMenu();
+                                return;
+                            }
+
+                            if (string.IsNullOrEmpty(temporaryInput) || !int.TryParse(temporaryInput, out int parsedGrade) || parsedGrade < 0 || parsedGrade > 100)
+                            {
+                                Console.WriteLine("Geçersiz öğrenci notu!");
+                                Thread.Sleep(2000);
+                                Console.Clear();
+                                continue;
+                            }
+                            student.Grades.Add(new CourseGrade
+                            {
+                                Course = course,
+                                Score = temporaryInput
+                            });
                             Console.Clear();
-                            continue;
+                            break;
                         }
-                        student.Grade = temporaryInput;
-                        Console.Clear();
-                        break;
                     }
                 }
                 LoadingAnim(2, LoadingType.dots);

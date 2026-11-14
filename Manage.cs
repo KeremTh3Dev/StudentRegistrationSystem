@@ -30,6 +30,9 @@ namespace StudentRegistrationSystem
                     case "notekle":
                         Algorithm.EnterGrades();
                         break;
+                    case "dersekle":
+                        Algorithm.RegisterCourse();
+                        break;
                     case "kaydetvecik":
                         Algorithm.SaveList();
                         return;
@@ -40,19 +43,11 @@ namespace StudentRegistrationSystem
                 }
             }
             while (unrecognizedCommand);
-
         }
+
 
     }
 }
 
-/* 
-
-notlarım:
 
 
-ders ekle diye bir kısım da olmalı
-ogrenci notu girerken de bir loop;
-ders adı: not:
-
-*/
