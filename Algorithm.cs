@@ -1,68 +1,25 @@
 ﻿
 namespace StudentRegistrationSystem
 {
-    
+
+
     public class Student
 {
     public required string Name { get; set; }
     public required string Surname { get; set; }
     public required string StudentNo { get; set; }
-    public int Grade { get; set; }
+    public required string Grade { get; set; }
+
 }
-    public static class MainLoop
+
+
+    public static class Algorithm
     {
         public static List<Student> students = new List<Student>();
 
-
-        public static void Run()
-        {
-            GiveInformation();
-            RunCommandLoop();
-        }
-
-        public static void GiveInformation()
-        {
-            Console.WriteLine("(komutlar: ogrencikaydet, ogrencinotgir, listeyikaydet, cikis)");
-        }
-
-        public static void RunCommandLoop()
-        {
-            //get input & direct accordingly
-
-            bool unrecognizedCommand = false;
-            do
-            {
-                unrecognizedCommand = false;
-                Console.Write("Komut Giriniz >> ");
-                string? komut = Console.ReadLine();
-
-                switch (komut)
-                {
-                    case "ogrencikaydet":
-                        RegisterStudent();
-                        break;
-                    case "ogrencinotgir":
-                        EnterGrades();
-                        break;
-                    case "listeyikaydet":
-                        SaveList();
-                        break;
-                    case "cikis":
-                        return;
-                    default:
-                        Thread.Sleep(400); //waitfor 0.4s
-                        Console.WriteLine("\n >>> Tanınmayan komut!\n");
-                        Thread.Sleep(400); //waitfor 0.4s
-                        unrecognizedCommand = true;
-                        break;
-                }
-            }
-            while (unrecognizedCommand);
-
-        }
-
         public static void RegisterStudent()
         {
+            Console.Clear();
             Console.WriteLine("\n--- Öğrenci Kayıt Modu ---");
             Console.WriteLine("Ana menüye dönmek için isim kısmına 'q' yazabilirsiniz.\n");
 
@@ -74,6 +31,7 @@ namespace StudentRegistrationSystem
                 if (name.ToLower() == "q")
                 {
                     Console.WriteLine(">>> Kayıt modundan çıkıldı.\n");
+                    Manage.MainMenu();
                     break;
                 }
 
@@ -83,12 +41,15 @@ namespace StudentRegistrationSystem
                     continue;
                 }
 
+                //---------------------------------
+
                 Console.Write("Öğrenci Soyadı: ");
                 string surname = Console.ReadLine()?.Trim() ?? "";
 
                 if (surname.ToLower() == "q")
                 {
                     Console.WriteLine(">>> Kayıt modundan çıkıldı.\n");
+                    Manage.MainMenu();
                     break;
                 }
 
@@ -98,12 +59,15 @@ namespace StudentRegistrationSystem
                     continue;
                 }
 
+                //---------------------------------
+
                 Console.Write("Öğrenci Numarası: ");
                 string studentNo = Console.ReadLine()?.Trim() ?? "";
 
                 if (studentNo.ToLower() == "q")
                 {
                     Console.WriteLine(">>> Kayıt modundan çıkıldı.\n");
+                    Manage.MainMenu();
                     break;
                 }
 
@@ -113,12 +77,32 @@ namespace StudentRegistrationSystem
                     continue;
                 }
 
+                //----------------------------------
+
+                Console.Write("Öğrenci notu: ");
+                string grade = Console.ReadLine()?.Trim() ?? "";
+
+                if (grade.ToLower() == "q")
+                {
+                    Console.WriteLine(">>> Kayıt modundan çıkıldı.\n");
+                    Manage.MainMenu();
+                    break;
+                }
+
+                if (string.IsNullOrEmpty(grade) || !int.TryParse(grade, out int parsedGrade)|| parsedGrade < 1 || parsedGrade > 100)
+                {
+                    Console.WriteLine(">>> Geçersiz öğrenci notu\n");
+                    continue;
+                }
+
+                //---------------------------------------
+
                 Student newStudent = new Student
                 {
                     Name = name,
                     Surname = surname,
                     StudentNo = studentNo,
-                    Grade = 0
+                    Grade = grade
                 };
 
                 students.Add(newStudent);
@@ -133,7 +117,17 @@ namespace StudentRegistrationSystem
         }
         public static void SaveList()
         {
-            //save lists
+            //save list to desktop
+        }
+        public static void ThrowException()
+        {
+            Thread.Sleep(400); //waitfor 0.4s
+            Console.WriteLine("\n >>> Tanınmayan komut!\n");
+            Thread.Sleep(400); //waitfor 0.4s
+        }
+        public static void GiveInformation()
+        {
+            Console.WriteLine("(komutlar: ogrenciekle, kaydetvecik)");
         }
     }
 }
