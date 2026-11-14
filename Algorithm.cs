@@ -107,33 +107,40 @@ namespace StudentRegistrationSystem
             }
         }
 
-
+        //------------------------------------------------------------------------------------------------------------------------------U N D E R-------------------------------------------------------------------------------------------------------
         public static void SaveList()
         {
             Console.Clear();
             foreach (var student in students)
             {
-                Console.WriteLine($"{student.StudentNo} no {student.Name} {student.Surname} adlı öğrencinin notu: {student.Grade}\n");
+                Console.WriteLine($@"
+                {student.StudentNo} no {student.Name} {student.Surname} adlı öğrencinin notları:
+                Default ders notu: {student.Grade} 
+                "); //asıl derslerin notları da sırasıyla iterate etmeli ve notları öğrenciye göre girilmeli. ancak aradaki ForeignKey nasıl olucak... iki sınıfı birbirine bağlayan bir key.
             }
-            
+
             while (true)
             {
                 Console.Write("\n >> Girilen bilgileri düzenlemek istiyor musunuz? (Y/N): ");
                 string input = Console.ReadLine()?.Trim().ToLower() ?? "";
-                if(input == "y")
+                if (input == "y")
                 {
-                    //bilgileri düzenlet
+                    //bilgileri düzenlet (sırasıyla ders ve student sınıfı)
                 }
-                else if(input == "n")
+                else if (input == "n")
                 {
                     Console.Clear();
-                    System.Console.WriteLine("Liste varsayılan olarak masaüstüne kaydedilecek, farklı bir dizin belirlemek ister misiniz? (Y/N)");
+                    System.Console.Write("Liste varsayılan olarak masaüstüne kaydedilecek, farklı bir dizin belirlemek ister misiniz? (Y/N)");
                     string input1 = Console.ReadLine()?.Trim().ToLower() ?? "";
-                    if(input1 == "y")
+                    if (input1 == "y")
                     {
+                        Console.Clear();
+                        Console.WriteLine("Lütfen listeyi kaydetmek istediğiniz dosya dizinini aşağıya kopyalayın");
+                        Console.Write("Dosya dizini: ");
+                        string path = Console.ReadLine() ?? ""; //burası windows/linuxte farklı olur gibi yav onu nasıl yapıcaz...
                         //dizin sor ve o dizine kaydet.
                     }
-                    else if(input1 == "n")
+                    else if (input1 == "n")
                     {
                         //desktopa kaydet
                     }
