@@ -90,7 +90,7 @@
                         return;
                     }
 
-                    if (string.IsNullOrEmpty(studentNo) || !int.TryParse(studentNo, out int parsedStudentNo) || parsedStudentNo < 1 || parsedStudentNo > 1000)
+                    if (string.IsNullOrEmpty(studentNo) || !int.TryParse(studentNo, out int parsedStudentNo) || parsedStudentNo < 1 || parsedStudentNo > 10000)
                     {
                         Console.WriteLine(">>> Geçersiz öğrenci numarası\n");
                         continue;
@@ -182,13 +182,13 @@
         public static void SaveList()
         {
             Console.Clear();
-            foreach (var student in students)
+            foreach (var student in students) //her bir öğrenci için ad soyad yazılır ve döngüde bütün ders ve notları alt alta geçilir.
             {
                 Console.WriteLine($"{student.StudentNo} no {student.Name} {student.Surname} adlı öğrencinin notları:");
 
                 foreach (var g in student.Grades)
                 {
-                    Console.Write($"{g.Course.CourseName} ({g.Course.Ects} AKTS): {g.Score}   ");
+                    Console.Write($"{g.Course.CourseName} ({g.Course.Ects} AKTS): {g.Score}p   ");
                 }
 
                 Console.WriteLine("\n");
@@ -226,6 +226,8 @@
                 }
             }
         }
+
+        
         public static void ThrowException()
         {
             Thread.Sleep(400); //waitfor 0.4s
@@ -290,7 +292,8 @@
                                 Console.Clear();
                                 continue;
                             }
-                            student.Grades.Add(new CourseGrade
+
+                            student.Grades.Add(new CourseGrade 
                             {
                                 Course = course,
                                 Score = temporaryInput

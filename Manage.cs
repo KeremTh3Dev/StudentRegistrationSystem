@@ -51,3 +51,7 @@ namespace StudentRegistrationSystem
 
 
 
+/*
+
+verbatim string dosyaları içeren bir class oluştur, algorithm.cs ve manage.cs'i ona bağla. Ardınadn AI'a at ki güzel bir UI tasarım yapsın
+*/
