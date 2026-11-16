@@ -181,21 +181,9 @@
         //------------------------------------------------------------------------------------------------------------------------------U N D E R-------------------------------------------------------------------------------------------------------
         public static void SaveList()
         {
-            Console.Clear();
-            foreach (var student in students) //her bir öğrenci için ad soyad yazılır ve döngüde bütün ders ve notları alt alta geçilir.
-            {
-                Console.WriteLine($"{student.StudentNo} no {student.Name} {student.Surname} adlı öğrencinin notları:");
-
-                foreach (var g in student.Grades)
-                {
-                    Console.Write($"{g.Course.CourseName} ({g.Course.Ects} AKTS): {g.Score}p   ");
-                }
-
-                Console.WriteLine("\n");
-            }
-
             while (true)
             {
+                ShowRegistered();
                 Console.Write("\n >> Girilen bilgileri düzenlemek istiyor musunuz? (Y/N): ");
                 string input = Console.ReadLine()?.Trim().ToLower() ?? "";
                 if (input == "y")
@@ -227,13 +215,33 @@
             }
         }
 
-        
+
         public static void ThrowException()
         {
             Thread.Sleep(400); //waitfor 0.4s
             Console.WriteLine("\n >>> Tanınmayan komut!\n");
             Thread.Sleep(400); //waitfor 0.4s
             Console.Clear();
+        }
+        public static void ShowRegistered()
+        {
+            Console.Clear();
+
+            int studentIndex = 1;
+            foreach (var student in students)
+            {
+                Console.WriteLine($" [{studentIndex}] {student.StudentNo} no {student.Name} {student.Surname} adlı öğrencinin notları:");
+
+                int gradeIndex = 1;
+                foreach (var g in student.Grades)
+                {
+                    Console.WriteLine($"({gradeIndex}) {g.Course.CourseName} ({g.Course.Ects} AKTS): {g.Score}p   ");
+                    gradeIndex++;
+                }
+
+                Console.WriteLine("\n");
+                studentIndex++;
+            }
         }
         public static void GiveInformation()
         {
@@ -245,6 +253,84 @@
             Console.Write("\n\n-- Sisteme Hoşgeldiniz! -- ");
             Thread.Sleep(3000);
         }
+
+
+        public static void EditRegistered()
+        {
+            while (true)
+            {
+                ShowRegistered(); 
+                Console.Write(("Öğrenci sırasını girin: "));
+                int studentIndex = Convert.ToInt32(Console.ReadLine());
+                Console.Write(("\nÖğrencinin ders sırasını girin: "));
+                int gradeIndex = Convert.ToInt32(Console.ReadLine());
+                System.Console.WriteLine("Öğrenci getiriliyor...");
+                Thread.Sleep(500);
+                LoadingAnim(2, LoadingType.text);
+                ShowStudent(studentIndex, gradeIndex);
+                
+                while (true)
+                {
+                    Console.Write("Düzenlemek istediğiniz kaydın sırasını seçiniz: ");
+                    int registryIndex = Convert.ToInt32(Console.ReadLine());
+                    switch (registryIndex)
+                    {
+                        case 1:
+                        //adını degistir
+                        break;
+
+                        case 2:
+                        //soyadı degistir
+                        break;
+
+                        case 3:
+                        //numara degistir
+                        break;
+
+                        case 4:
+                        //ders adını degistir (uyarı gec bütün ders adları degisecek)
+                        break;
+
+                        case 5:
+                        //ders akts degistir (uyarı)
+                        break;
+
+                        case 6:
+                        //ders notunu degistir
+                        break;
+                    }
+                }
+            }
+        }
+
+        public static void ShowStudent(int studentIndex, int gradeIndex)
+        {
+            // 0-based indekse çek
+            int sIdx = studentIndex - 1;
+            int gIdx = gradeIndex - 1;
+
+            // Öğrenci indeksi listede var mı?
+            if (sIdx < 0 || sIdx >= students.Count)
+            {
+                Console.WriteLine(">>> Geçersiz öğrenci sırası!");
+                return;
+            }
+            // Seçilen öğrencinin o indekste dersi var mı?
+            if (gIdx < 0 || gIdx >= students[sIdx].Grades.Count)
+            {
+                Console.WriteLine(">>> Geçersiz ders sırası!");
+                return;
+            }
+
+            Console.WriteLine($"(1) Öğrenci adı: {students[sIdx].Name}");
+            Console.WriteLine($"(2) Öğrenci soyadı: {students[sIdx].Surname}");
+            Console.WriteLine($"(3) Öğrenci numarası: {students[sIdx].StudentNo}");
+
+            Console.WriteLine($"(4) Ders adı: {students[sIdx].Grades[gIdx].Course.CourseName}");
+            Console.WriteLine($"(5) Ders AKTS: {students[sIdx].Grades[gIdx].Course.Ects}");
+            Console.WriteLine($"(6) Ders Notu: {students[sIdx].Grades[gIdx].Score}");
+        }
+
 
         public static void EnterGrades()
         {
@@ -293,7 +379,7 @@
                                 continue;
                             }
 
-                            student.Grades.Add(new CourseGrade 
+                            student.Grades.Add(new CourseGrade
                             {
                                 Course = course,
                                 Score = temporaryInput
