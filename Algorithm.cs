@@ -43,10 +43,9 @@
                     if (name.ToLower() == "q")
                     {
                         Console.WriteLine(">>> Kayıt modundan çıkıldı.\n");
-                        Manage.MainMenu();
                         return;
                     }
-                    if (string.IsNullOrEmpty(name) || !name.All(char.IsLetter))
+                    if (string.IsNullOrEmpty(name) || !IsValidName(name))
                     {
                         Console.WriteLine(">>> Geçersiz isim\n");
                         continue;
@@ -64,11 +63,10 @@
                     if (surname.ToLower() == "q")
                     {
                         Console.WriteLine(">>> Kayıt modundan çıkıldı.\n");
-                        Manage.MainMenu();
                         return;
                     }
 
-                    if (string.IsNullOrEmpty(surname) || !surname.All(char.IsLetter))
+                    if (string.IsNullOrEmpty(surname) || !IsValidName(surname))
                     {
                         Console.WriteLine(">>> Geçersiz soyad\n");
                         continue;
@@ -86,7 +84,6 @@
                     if (studentNo.ToLower() == "q")
                     {
                         Console.WriteLine(">>> Kayıt modundan çıkıldı.\n");
-                        Manage.MainMenu();
                         return;
                     }
 
@@ -134,10 +131,9 @@
                     if (courseName.ToLower() == "q")
                     {
                         Console.WriteLine(">>> Kayıt modundan çıkıldı.\n");
-                        Manage.MainMenu();
                         return;
                     }
-                    if (string.IsNullOrEmpty(courseName) || !courseName.All(char.IsLetter))
+                    if (string.IsNullOrEmpty(courseName) || !IsValidName(courseName))
                     {
                         Console.WriteLine(">>> Geçersiz ad\n");
                         continue;
@@ -152,7 +148,6 @@
                     if (ects.ToLower() == "q")
                     {
                         Console.WriteLine(">>> Kayıt modundan çıkıldı.\n");
-                        Manage.MainMenu();
                         return;
                     }
                     if (string.IsNullOrEmpty(ects) || !int.TryParse(ects, out int parsedEcts) || parsedEcts < 1 || parsedEcts > 10)
@@ -179,15 +174,14 @@
         }
 
         //------------------------------------------------------------------------------------------------------------------------------U N D E R-------------------------------------------------------------------------------------------------------
-        public static void SaveList()
+        public static bool SaveList()
         {
             if (students.Count == 0)
             {
                 Console.Clear();
                 Console.WriteLine("\n\nÖncelikle en az 1 öğrenci kaydediniz.\n");
                 Thread.Sleep(3000);
-                Manage.MainMenu();
-                return;
+                return false;
             }
 
             // --- Düzenleme sorusu ---
@@ -197,7 +191,7 @@
                 if (AskYesNo("\n >> Girilen bilgileri düzenlemek istiyor musunuz? (Y/N): "))
                 {
                     EditRegistered(); // kendi sonunda ana menüye döner
-                    return;
+                    return false;
                 }
                 break;
             }
@@ -222,8 +216,7 @@
                         if (input.ToLower() == "q")
                         {
                             Console.WriteLine(">>> Kaydetme modundan çıkıldı.\n");
-                            Manage.MainMenu();
-                            return;
+                            return false;
                         }
 
                         // Windows'ta "Yol olarak kopyala" yapınca gelen tırnakları temizle
@@ -300,8 +293,7 @@
                 Console.WriteLine("\n  >>> Liste başarıyla kaydedildi!\n");
                 Console.WriteLine($"  Konum: {fullPath}\n");
                 Thread.Sleep(3000);
-                Manage.MainMenu();
-                return;
+                return true;
             }
 
             // ----------- Yerel yardımcı fonksiyon -----------
@@ -322,6 +314,10 @@
             }
         }
 
+
+        // Harf ve boşluk kabul eder (ör. "Ali Can", "Veri Yapıları")
+        public static bool IsValidName(string s) =>
+            !string.IsNullOrWhiteSpace(s) && s.All(c => char.IsLetter(c) || c == ' ');
 
         public static void ThrowException()
         {
@@ -369,7 +365,6 @@
                 Console.Clear();
                 Console.WriteLine("\n\nÖncelikle en az 1 öğrenci kaydediniz.\n");
                 Thread.Sleep(3000);
-                Manage.MainMenu();
                 return;
             }
 
@@ -380,7 +375,6 @@
             if (!ReadIndex("Öğrenci sırasını girin: ", 1, students.Count, out int studentIndex))
             {
                 Console.WriteLine(">>> Düzenleme modundan çıkıldı.\n");
-                Manage.MainMenu();
                 return;
             }
 
@@ -395,7 +389,6 @@
                 if (!ReadIndex("\nÖğrencinin ders sırasını girin: ", 1, student.Grades.Count, out int gradeIndex))
                 {
                     Console.WriteLine(">>> Düzenleme modundan çıkıldı.\n");
-                    Manage.MainMenu();
                     return;
                 }
                 gIdx = gradeIndex - 1;
@@ -430,7 +423,6 @@
                 if (!ReadIndex("Düzenlemek istediğiniz kaydın sırasını seçiniz: ", 1, maxField, out int registryIndex))
                 {
                     Console.WriteLine(">>> Düzenleme modundan çıkıldı.\n");
-                    Manage.MainMenu();
                     return;
                 }
 
@@ -440,7 +432,6 @@
                     case 1:
                         if (!ReadValue("ad", student.Name, IsValidName, ">>> Geçersiz isim\n", out newValue))
                         {
-                            Manage.MainMenu();
                             return;
                         }
                         student.Name = newValue;
@@ -450,7 +441,6 @@
                     case 2:
                         if (!ReadValue("soyad", student.Surname, IsValidName, ">>> Geçersiz soyad\n", out newValue))
                         {
-                            Manage.MainMenu();
                             return;
                         }
                         student.Surname = newValue;
@@ -460,7 +450,6 @@
                     case 3:
                         if (!ReadValue("numara", student.StudentNo, IsValidStudentNo, ">>> Geçersiz öğrenci numarası\n", out newValue))
                         {
-                            Manage.MainMenu();
                             return;
                         }
                         student.StudentNo = newValue;
@@ -473,7 +462,6 @@
                         Console.Clear();
                         if (!ReadValue("ders adı", student.Grades[gIdx].Course.CourseName, IsValidName, ">>> Geçersiz ad\n", out newValue))
                         {
-                            Manage.MainMenu();
                             return;
                         }
                         student.Grades[gIdx].Course.CourseName = newValue;
@@ -486,7 +474,6 @@
                         Console.Clear();
                         if (!ReadValue("ders kredisi", student.Grades[gIdx].Course.Ects, IsValidEcts, ">>> Geçersiz ders kredisi\n", out newValue))
                         {
-                            Manage.MainMenu();
                             return;
                         }
                         student.Grades[gIdx].Course.Ects = newValue;
@@ -496,7 +483,6 @@
                     case 6:
                         if (!ReadValue("ders notu", student.Grades[gIdx].Score, IsValidScore, ">>> Geçersiz öğrenci notu\n", out newValue))
                         {
-                            Manage.MainMenu();
                             return;
                         }
                         student.Grades[gIdx].Score = newValue;
@@ -524,7 +510,6 @@
                     if (answer == "n" || answer == "q")
                     {
                         Console.WriteLine(">>> Düzenleme modundan çıkıldı.\n");
-                        Manage.MainMenu();
                         return;
                     }
                     ThrowException();
@@ -577,7 +562,6 @@
                 }
             }
 
-            static bool IsValidName(string s) => !string.IsNullOrEmpty(s) && s.All(char.IsLetter);
             static bool IsValidStudentNo(string s) => int.TryParse(s, out int n) && n >= 1 && n <= 10000;
             static bool IsValidEcts(string s) => int.TryParse(s, out int n) && n >= 1 && n <= 10;
             static bool IsValidScore(string s) => int.TryParse(s, out int n) && n >= 0 && n <= 100;
@@ -618,7 +602,6 @@
                 Console.Clear();
                 Console.WriteLine("\n\nÖncelikle en az 1 öğrenci kaydediniz.\n");
                 Thread.Sleep(3000);
-                Manage.MainMenu();
                 return;
             }
             if (courses.Count == 0)
@@ -626,53 +609,59 @@
                 Console.Clear();
                 Console.WriteLine("\n\nÖncelikle en az 1 ders kaydediniz.\n");
                 Thread.Sleep(3000);
-                Manage.MainMenu();
                 return;
             }
-            else
+
+            Console.Clear();
+            Console.WriteLine("Çıkmak için 'q' yazabilirsiniz (girilen notlar kaydedilmez).\n");
+
+            // Notlar önce geçici listede toplanır, hepsi girilince öğrencilere işlenir.
+            var pending = new List<List<CourseGrade>>();
+            foreach (var student in students)
             {
-                Console.Clear();
-                foreach (var student in students)
+                var list = new List<CourseGrade>();
+                foreach (var course in courses)
                 {
-                    student.Grades.Clear();
-
-                    foreach (var course in courses)
+                    while (true)
                     {
-                        while (true)
+                        Console.Write($"{student.Name} {student.Surname} ({student.StudentNo}no) - {course.CourseName} notu: ");
+                        string temporaryInput = Console.ReadLine()?.Trim() ?? "";
+
+                        if (temporaryInput.ToLower() == "q")
                         {
-                            Console.Write($"{student.Name} {student.Surname} ({student.StudentNo}no) - {course.CourseName} notu: ");
-                            string temporaryInput = Console.ReadLine() ?? "";
-
-                            if (temporaryInput?.ToLower() == "q")
-                            {
-                                Console.WriteLine(">>> Kayıt modundan çıkıldı.\n");
-                                Manage.MainMenu();
-                                return;
-                            }
-
-                            if (string.IsNullOrEmpty(temporaryInput) || !int.TryParse(temporaryInput, out int parsedGrade) || parsedGrade < 0 || parsedGrade > 100)
-                            {
-                                Console.WriteLine("Geçersiz öğrenci notu!");
-                                Thread.Sleep(2000);
-                                Console.Clear();
-                                continue;
-                            }
-
-                            student.Grades.Add(new CourseGrade
-                            {
-                                Course = course,
-                                Score = temporaryInput
-                            });
-                            Console.Clear();
-                            break;
+                            Console.WriteLine(">>> Kayıt modundan çıkıldı. Girilen notlar kaydedilmedi.\n");
+                            Thread.Sleep(1500);
+                            return;
                         }
+
+                        if (!int.TryParse(temporaryInput, out int parsedGrade) || parsedGrade < 0 || parsedGrade > 100)
+                        {
+                            Console.WriteLine("Geçersiz öğrenci notu!");
+                            Thread.Sleep(2000);
+                            Console.Clear();
+                            continue;
+                        }
+
+                        list.Add(new CourseGrade
+                        {
+                            Course = course,
+                            Score = parsedGrade.ToString()
+                        });
+                        Console.Clear();
+                        break;
                     }
                 }
-                LoadingAnim(2, LoadingType.dots);
-                Console.Write("Tüm notlar başarıyla eklendi! ");
-                Thread.Sleep(2000);
-                Manage.MainMenu();
+                pending.Add(list);
             }
+
+            for (int i = 0; i < students.Count; i++)
+            {
+                students[i].Grades = pending[i];
+            }
+
+            LoadingAnim(2, LoadingType.dots);
+            Console.Write("Tüm notlar başarıyla eklendi! ");
+            Thread.Sleep(2000);
         }
 
 
