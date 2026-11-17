@@ -181,36 +181,143 @@
         //------------------------------------------------------------------------------------------------------------------------------U N D E R-------------------------------------------------------------------------------------------------------
         public static void SaveList()
         {
+            if (students.Count == 0)
+            {
+                Console.Clear();
+                Console.WriteLine("\n\nÖncelikle en az 1 öğrenci kaydediniz.\n");
+                Thread.Sleep(3000);
+                Manage.MainMenu();
+                return;
+            }
+
+            // --- Düzenleme sorusu ---
             while (true)
             {
                 ShowRegistered();
-                Console.Write("\n >> Girilen bilgileri düzenlemek istiyor musunuz? (Y/N): ");
-                string input = Console.ReadLine()?.Trim().ToLower() ?? "";
-                if (input == "y")
+                if (AskYesNo("\n >> Girilen bilgileri düzenlemek istiyor musunuz? (Y/N): "))
                 {
-                    //bilgileri düzenlet (sırasıyla ders ve student sınıfı)
+                    EditRegistered(); // kendi sonunda ana menüye döner
+                    return;
                 }
-                else if (input == "n")
+                break;
+            }
+
+            // --- Kayıt dizini seçimi ve kaydetme ---
+            while (true)
+            {
+                Console.Clear();
+                string directory;
+
+                if (AskYesNo("Liste varsayılan olarak masaüstüne kaydedilecek, farklı bir dizin belirlemek ister misiniz? (Y/N): "))
                 {
                     Console.Clear();
-                    System.Console.Write("Liste varsayılan olarak masaüstüne kaydedilecek, farklı bir dizin belirlemek ister misiniz? (Y/N)");
-                    string input1 = Console.ReadLine()?.Trim().ToLower() ?? "";
-                    if (input1 == "y")
+                    Console.WriteLine("Lütfen listeyi kaydetmek istediğiniz dosya dizinini aşağıya kopyalayın");
+                    Console.WriteLine("(Ana menüye dönmek için 'q' yazabilirsiniz.)\n");
+
+                    while (true)
                     {
-                        Console.Clear();
-                        Console.WriteLine("Lütfen listeyi kaydetmek istediğiniz dosya dizinini aşağıya kopyalayın");
                         Console.Write("Dosya dizini: ");
-                        string path = Console.ReadLine() ?? ""; //burası windows/linuxte farklı olur gibi yav onu nasıl yapıcaz...
-                        //dizin sor ve o dizine kaydet.
-                    }
-                    else if (input1 == "n")
-                    {
-                        //desktopa kaydet
+                        string input = Console.ReadLine()?.Trim() ?? "";
+
+                        if (input.ToLower() == "q")
+                        {
+                            Console.WriteLine(">>> Kaydetme modundan çıkıldı.\n");
+                            Manage.MainMenu();
+                            return;
+                        }
+
+                        // Windows'ta "Yol olarak kopyala" yapınca gelen tırnakları temizle
+                        input = input.Trim('"', '\'').Trim();
+
+                        if (string.IsNullOrEmpty(input) || !Directory.Exists(input))
+                        {
+                            Console.WriteLine(">>> Dizin bulunamadı!\n");
+                            continue;
+                        }
+
+                        directory = input;
+                        break;
                     }
                 }
                 else
                 {
+                    directory = Environment.GetFolderPath(Environment.SpecialFolder.Desktop);
+
+                    // Linux'ta masaüstü klasörü yoksa boş dönebilir, ana klasöre kaydet
+                    if (string.IsNullOrEmpty(directory) || !Directory.Exists(directory))
+                    {
+                        directory = Environment.GetFolderPath(Environment.SpecialFolder.UserProfile);
+                        Console.WriteLine("\n>>> Masaüstü bulunamadı, ana klasöre kaydedilecek.");
+                        Thread.Sleep(1500);
+                    }
+                }
+
+                // --- Dosya içeriğini hazırla (ShowRegistered ile aynı görünüm) ---
+                var sb = new System.Text.StringBuilder();
+                int studentIndex = 1;
+                foreach (var student in students)
+                {
+                    sb.AppendLine($" [{studentIndex}] {student.StudentNo} no {student.Name} {student.Surname} adlı öğrencinin notları:");
+
+                    if (student.Grades.Count == 0)
+                    {
+                        sb.AppendLine("     Not kaydı yok.");
+                    }
+
+                    int gradeIndex = 1;
+                    foreach (var g in student.Grades)
+                    {
+                        sb.AppendLine($"({gradeIndex}) {g.Course.CourseName} ({g.Course.Ects} AKTS): {g.Score}p");
+                        gradeIndex++;
+                    }
+
+                    sb.AppendLine();
+                    studentIndex++;
+                }
+
+                string fileName = $"ogrenci_listesi_{DateTime.Now:yyyyMMdd_HHmmss}.txt";
+                string fullPath = Path.Combine(directory, fileName);
+
+                // --- Dosyaya yaz ---
+                try
+                {
+                    File.WriteAllText(fullPath, sb.ToString(), new System.Text.UTF8Encoding(true));
+                }
+                catch (UnauthorizedAccessException)
+                {
+                    Console.WriteLine("\n>>> Bu dizine yazma izniniz yok!");
+                    Thread.Sleep(2500);
+                    continue; // dizin sorusuna geri dön
+                }
+                catch (Exception ex)
+                {
+                    Console.WriteLine($"\n>>> Dosya kaydedilemedi: {ex.Message}");
+                    Thread.Sleep(2500);
                     continue;
+                }
+
+                Console.Clear();
+                Console.WriteLine("\n  >>> Liste başarıyla kaydedildi!\n");
+                Console.WriteLine($"  Konum: {fullPath}\n");
+                Thread.Sleep(3000);
+                Manage.MainMenu();
+                return;
+            }
+
+            // ----------- Yerel yardımcı fonksiyon -----------
+
+            // Y/N cevabı alana kadar sorar. y -> true, n -> false.
+            static bool AskYesNo(string prompt)
+            {
+                while (true)
+                {
+                    Console.Write(prompt);
+                    string input = Console.ReadLine()?.Trim().ToLower() ?? "";
+
+                    if (input == "y") return true;
+                    if (input == "n") return false;
+
+                    ThrowException();
                 }
             }
         }
@@ -257,92 +364,224 @@
 
         public static void EditRegistered()
         {
-            
+            if (students.Count == 0)
+            {
+                Console.Clear();
+                Console.WriteLine("\n\nÖncelikle en az 1 öğrenci kaydediniz.\n");
+                Thread.Sleep(3000);
+                Manage.MainMenu();
+                return;
+            }
+
+            ShowRegistered();
+            Console.WriteLine(" Ana menüye dönmek için 'q' yazabilirsiniz.\n");
+
+            // --- Öğrenci seçimi ---
+            if (!ReadIndex("Öğrenci sırasını girin: ", 1, students.Count, out int studentIndex))
+            {
+                Console.WriteLine(">>> Düzenleme modundan çıkıldı.\n");
+                Manage.MainMenu();
+                return;
+            }
+
+            int sIdx = studentIndex - 1;
+            Student student = students[sIdx];
+            bool hasGrades = student.Grades.Count > 0;
+            int gIdx = -1;
+
+            // --- Ders seçimi (not kaydı varsa) ---
+            if (hasGrades)
+            {
+                if (!ReadIndex("\nÖğrencinin ders sırasını girin: ", 1, student.Grades.Count, out int gradeIndex))
+                {
+                    Console.WriteLine(">>> Düzenleme modundan çıkıldı.\n");
+                    Manage.MainMenu();
+                    return;
+                }
+                gIdx = gradeIndex - 1;
+            }
+            else
+            {
+                Console.WriteLine("\nBu öğrencinin not kaydı yok, sadece ad, soyad ve numara düzenlenebilir.");
+                Thread.Sleep(2000);
+            }
+
+            Console.WriteLine("Öğrenci getiriliyor...");
+            Thread.Sleep(500);
+            LoadingAnim(2, LoadingType.text);
+
+            // --- Düzenleme döngüsü ---
             while (true)
             {
-                ShowRegistered(); 
-                Console.Write("Öğrenci sırasını girin: ");
-                int studentIndex = Convert.ToInt32(Console.ReadLine());
-                Console.Write("\nÖğrencinin ders sırasını girin: ");
-                int gradeIndex = Convert.ToInt32(Console.ReadLine());
-                System.Console.WriteLine("Öğrenci getiriliyor...");
-                Thread.Sleep(500);
-                LoadingAnim(2, LoadingType.text);
-                ShowStudent(studentIndex, gradeIndex);
-                int sIdx = studentIndex - 1;
-                int gIdx = gradeIndex - 1;
-                
+                Console.Clear();
+                if (hasGrades)
+                {
+                    ShowStudent(studentIndex, gIdx + 1);
+                }
+                else
+                {
+                    Console.WriteLine($"(1) Öğrenci adı: {student.Name}");
+                    Console.WriteLine($"(2) Öğrenci soyadı: {student.Surname}");
+                    Console.WriteLine($"(3) Öğrenci numarası: {student.StudentNo}");
+                }
+                Console.WriteLine("\n (çıkmak için q basınız)\n");
+
+                int maxField = hasGrades ? 6 : 3;
+                if (!ReadIndex("Düzenlemek istediğiniz kaydın sırasını seçiniz: ", 1, maxField, out int registryIndex))
+                {
+                    Console.WriteLine(">>> Düzenleme modundan çıkıldı.\n");
+                    Manage.MainMenu();
+                    return;
+                }
+
+                string newValue;
+                switch (registryIndex)
+                {
+                    case 1:
+                        if (!ReadValue("ad", student.Name, IsValidName, ">>> Geçersiz isim\n", out newValue))
+                        {
+                            Manage.MainMenu();
+                            return;
+                        }
+                        student.Name = newValue;
+                        Console.WriteLine("Ad başarıyla değiştirildi!");
+                        break;
+
+                    case 2:
+                        if (!ReadValue("soyad", student.Surname, IsValidName, ">>> Geçersiz soyad\n", out newValue))
+                        {
+                            Manage.MainMenu();
+                            return;
+                        }
+                        student.Surname = newValue;
+                        Console.WriteLine("Soyad başarıyla değiştirildi!");
+                        break;
+
+                    case 3:
+                        if (!ReadValue("numara", student.StudentNo, IsValidStudentNo, ">>> Geçersiz öğrenci numarası\n", out newValue))
+                        {
+                            Manage.MainMenu();
+                            return;
+                        }
+                        student.StudentNo = newValue;
+                        Console.WriteLine("Numara başarıyla değiştirildi!");
+                        break;
+
+                    case 4:
+                        Console.WriteLine($"Uyarı: Bütün {student.Grades[gIdx].Course.CourseName} adlı dersler değişecek!");
+                        Thread.Sleep(3000);
+                        Console.Clear();
+                        if (!ReadValue("ders adı", student.Grades[gIdx].Course.CourseName, IsValidName, ">>> Geçersiz ad\n", out newValue))
+                        {
+                            Manage.MainMenu();
+                            return;
+                        }
+                        student.Grades[gIdx].Course.CourseName = newValue;
+                        Console.WriteLine("Ders adı başarıyla değiştirildi!");
+                        break;
+
+                    case 5:
+                        Console.WriteLine($"Uyarı: Bütün {student.Grades[gIdx].Course.CourseName} adlı derslerin kredisi değişecek!");
+                        Thread.Sleep(3000);
+                        Console.Clear();
+                        if (!ReadValue("ders kredisi", student.Grades[gIdx].Course.Ects, IsValidEcts, ">>> Geçersiz ders kredisi\n", out newValue))
+                        {
+                            Manage.MainMenu();
+                            return;
+                        }
+                        student.Grades[gIdx].Course.Ects = newValue;
+                        Console.WriteLine("Ders kredisi başarıyla değiştirildi!");
+                        break;
+
+                    case 6:
+                        if (!ReadValue("ders notu", student.Grades[gIdx].Score, IsValidScore, ">>> Geçersiz öğrenci notu\n", out newValue))
+                        {
+                            Manage.MainMenu();
+                            return;
+                        }
+                        student.Grades[gIdx].Score = newValue;
+                        Console.WriteLine("Ders notu başarıyla değiştirildi!");
+                        break;
+
+                    default:
+                        ThrowException();
+                        continue;
+                }
+
+                Thread.Sleep(2000);
+
+                // --- Devam mı? ---
                 while (true)
                 {
-                    Console.Write("Düzenlemek istediğiniz kaydın sırasını seçiniz: ");
-                    int registryIndex = Convert.ToInt32(Console.ReadLine());
+                    Console.Clear();
+                    Console.Write("Başka bir kaydı düzenlemek istiyor musunuz? (Y/N): ");
+                    string answer = Console.ReadLine()?.Trim().ToLower() ?? "";
 
-                    switch (registryIndex)
+                    if (answer == "y")
                     {
-                        case 1:
-                        //adını degistir
-                        Console.WriteLine($"Eski ad: {students[sIdx].Name}");
-                        Console.Write($"Yeni ad:");
-                        students[sIdx].Name = Console.ReadLine() ?? "";
-                        Console.WriteLine("Ad başarıyla değiştirildi!");
-                        Thread.Sleep(2000);
-                        break;
-
-                        case 2:
-                        //soyadı degistir
-                        Console.WriteLine($"Eski soyad: {students[sIdx].Surname}");
-                        Console.Write($"Yeni soyad:");
-                        students[sIdx].Surname = Console.ReadLine() ?? "";
-                        Console.WriteLine("Soyad başarıyla değiştirildi!");
-                        Thread.Sleep(2000);
-                        break;
-
-                        case 3:
-                        //numara degistir
-                        Console.WriteLine($"Eski numara: {students[sIdx].StudentNo}");
-                        Console.Write($"Yeni numara:");
-                        students[sIdx].StudentNo = Console.ReadLine() ?? "";
-                        Console.WriteLine("Numara başarıyla değiştirildi!");
-                        Thread.Sleep(2000);
-                        break;
-
-                        case 4:
-                        //Ders adını değiştir
-                        System.Console.WriteLine($"Uyarı: Bütün {students[sIdx].Grades[gIdx].Course.CourseName} adlı dersler değişecek!");
-                        Thread.Sleep(3000);
-                        Console.Clear();
-                        Console.WriteLine($"Eski ders adı: {students[sIdx].Grades[gIdx].Course.CourseName}");
-                        Console.Write($"Yeni ders adı:");
-                        students[sIdx].Grades[gIdx].Course.CourseName = Console.ReadLine() ?? "";
-                        Console.WriteLine("Ders adı başarıyla değiştirildi!");
-                        Thread.Sleep(2000);
-                        break;
-
-                        case 5:
-                        //ders akts degistir (uyarı)
-                        System.Console.WriteLine($"Uyarı: Bütün {students[sIdx].Grades[gIdx].Course.Ects} adlı derslerin kredisi değişecek!");
-                        Thread.Sleep(3000);
-                        Console.Clear();
-                        Console.WriteLine($"Eski ders kredisi: {students[sIdx].Grades[gIdx].Course.Ects}");
-                        Console.Write($"Yeni ders kredisi:");
-                        students[sIdx].Grades[gIdx].Course.Ects = Console.ReadLine() ?? "";
-                        Console.WriteLine("Ders kredisi başarıyla değiştirildi!");
-                        Thread.Sleep(2000);
-                        break;
-
-                        case 6:
-                        //ders notunu degistir
-                        Console.WriteLine($"Eski ders notu: {students[sIdx].Grades[gIdx].Score}");
-                        Console.Write($"Yeni ders notu:");
-                        students[sIdx].Grades[gIdx].Score = Console.ReadLine() ?? "";
-                        Console.WriteLine("Ders notu başarıyla değiştirildi!");
-                        Thread.Sleep(2000);
-                        break;
+                        break; // dıştaki döngü: aynı öğrenci/ders ile devam
                     }
+                    if (answer == "n" || answer == "q")
+                    {
+                        Console.WriteLine(">>> Düzenleme modundan çıkıldı.\n");
+                        Manage.MainMenu();
+                        return;
+                    }
+                    ThrowException();
                 }
             }
-        }
 
+            // ----------- Yerel yardımcı fonksiyonlar -----------
+
+            // Sıra numarası okur. 'q' yazılırsa false döner.
+            static bool ReadIndex(string prompt, int min, int max, out int value)
+            {
+                while (true)
+                {
+                    Console.Write(prompt);
+                    string input = Console.ReadLine()?.Trim() ?? "";
+
+                    if (input.ToLower() == "q")
+                    {
+                        value = 0;
+                        return false;
+                    }
+                    if (int.TryParse(input, out value) && value >= min && value <= max)
+                    {
+                        return true;
+                    }
+                    Console.WriteLine(">>> Geçersiz sıra!\n");
+                }
+            }
+
+            // Eski değeri gösterip yeni değeri doğrulayarak okur. 'q' yazılırsa false döner.
+            static bool ReadValue(string label, string oldValue, Func<string, bool> isValid, string errorMessage, out string newValue)
+            {
+                Console.WriteLine($"Eski {label}: {oldValue}");
+                while (true)
+                {
+                    Console.Write($"Yeni {label}: ");
+                    string input = Console.ReadLine()?.Trim() ?? "";
+
+                    if (input.ToLower() == "q")
+                    {
+                        newValue = "";
+                        return false;
+                    }
+                    if (isValid(input))
+                    {
+                        newValue = input;
+                        return true;
+                    }
+                    Console.WriteLine(errorMessage);
+                }
+            }
+
+            static bool IsValidName(string s) => !string.IsNullOrEmpty(s) && s.All(char.IsLetter);
+            static bool IsValidStudentNo(string s) => int.TryParse(s, out int n) && n >= 1 && n <= 10000;
+            static bool IsValidEcts(string s) => int.TryParse(s, out int n) && n >= 1 && n <= 10;
+            static bool IsValidScore(string s) => int.TryParse(s, out int n) && n >= 0 && n <= 100;
+        }
         public static void ShowStudent(int studentIndex, int gradeIndex)
         {
             // 0-based indekse çek

@@ -4,13 +4,9 @@ namespace StudentRegistrationSystem
     {
         public static void Run()
         {
-            Algorithm.RegisterStudent();
-
-            /*
             Console.Clear();
             Algorithm.Welcome();
             MainMenu();
-            */
         }
 
 
@@ -38,7 +34,7 @@ namespace StudentRegistrationSystem
                         Algorithm.RegisterCourse();
                         break;
                     case "kaydetvecik":
-                        Algorithm.EditRegistered(); //Burası savelist olmalı
+                        Algorithm.SaveList(); 
                         return;
                     default:
                         Algorithm.ThrowException();
