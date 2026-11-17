@@ -257,46 +257,86 @@
 
         public static void EditRegistered()
         {
+            
             while (true)
             {
                 ShowRegistered(); 
-                Console.Write(("Öğrenci sırasını girin: "));
+                Console.Write("Öğrenci sırasını girin: ");
                 int studentIndex = Convert.ToInt32(Console.ReadLine());
-                Console.Write(("\nÖğrencinin ders sırasını girin: "));
+                Console.Write("\nÖğrencinin ders sırasını girin: ");
                 int gradeIndex = Convert.ToInt32(Console.ReadLine());
                 System.Console.WriteLine("Öğrenci getiriliyor...");
                 Thread.Sleep(500);
                 LoadingAnim(2, LoadingType.text);
                 ShowStudent(studentIndex, gradeIndex);
+                int sIdx = studentIndex - 1;
+                int gIdx = gradeIndex - 1;
                 
                 while (true)
                 {
                     Console.Write("Düzenlemek istediğiniz kaydın sırasını seçiniz: ");
                     int registryIndex = Convert.ToInt32(Console.ReadLine());
+
                     switch (registryIndex)
                     {
                         case 1:
                         //adını degistir
+                        Console.WriteLine($"Eski ad: {students[sIdx].Name}");
+                        Console.Write($"Yeni ad:");
+                        students[sIdx].Name = Console.ReadLine() ?? "";
+                        Console.WriteLine("Ad başarıyla değiştirildi!");
+                        Thread.Sleep(2000);
                         break;
 
                         case 2:
                         //soyadı degistir
+                        Console.WriteLine($"Eski soyad: {students[sIdx].Surname}");
+                        Console.Write($"Yeni soyad:");
+                        students[sIdx].Surname = Console.ReadLine() ?? "";
+                        Console.WriteLine("Soyad başarıyla değiştirildi!");
+                        Thread.Sleep(2000);
                         break;
 
                         case 3:
                         //numara degistir
+                        Console.WriteLine($"Eski numara: {students[sIdx].StudentNo}");
+                        Console.Write($"Yeni numara:");
+                        students[sIdx].StudentNo = Console.ReadLine() ?? "";
+                        Console.WriteLine("Numara başarıyla değiştirildi!");
+                        Thread.Sleep(2000);
                         break;
 
                         case 4:
-                        //ders adını degistir (uyarı gec bütün ders adları degisecek)
+                        //Ders adını değiştir
+                        System.Console.WriteLine($"Uyarı: Bütün {students[sIdx].Grades[gIdx].Course.CourseName} adlı dersler değişecek!");
+                        Thread.Sleep(3000);
+                        Console.Clear();
+                        Console.WriteLine($"Eski ders adı: {students[sIdx].Grades[gIdx].Course.CourseName}");
+                        Console.Write($"Yeni ders adı:");
+                        students[sIdx].Grades[gIdx].Course.CourseName = Console.ReadLine() ?? "";
+                        Console.WriteLine("Ders adı başarıyla değiştirildi!");
+                        Thread.Sleep(2000);
                         break;
 
                         case 5:
                         //ders akts degistir (uyarı)
+                        System.Console.WriteLine($"Uyarı: Bütün {students[sIdx].Grades[gIdx].Course.Ects} adlı derslerin kredisi değişecek!");
+                        Thread.Sleep(3000);
+                        Console.Clear();
+                        Console.WriteLine($"Eski ders kredisi: {students[sIdx].Grades[gIdx].Course.Ects}");
+                        Console.Write($"Yeni ders kredisi:");
+                        students[sIdx].Grades[gIdx].Course.Ects = Console.ReadLine() ?? "";
+                        Console.WriteLine("Ders kredisi başarıyla değiştirildi!");
+                        Thread.Sleep(2000);
                         break;
 
                         case 6:
                         //ders notunu degistir
+                        Console.WriteLine($"Eski ders notu: {students[sIdx].Grades[gIdx].Score}");
+                        Console.Write($"Yeni ders notu:");
+                        students[sIdx].Grades[gIdx].Score = Console.ReadLine() ?? "";
+                        Console.WriteLine("Ders notu başarıyla değiştirildi!");
+                        Thread.Sleep(2000);
                         break;
                     }
                 }
