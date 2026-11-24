@@ -614,8 +614,6 @@
 
             Console.Clear();
             Console.WriteLine("Çıkmak için 'q' yazabilirsiniz (girilen notlar kaydedilmez).\n");
-
-            // Notlar önce geçici listede toplanır, hepsi girilince öğrencilere işlenir.
             var pending = new List<List<CourseGrade>>();
             foreach (var student in students)
             {

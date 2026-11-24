@@ -16,7 +16,6 @@ namespace StudentRegistrationSystem
             Console.WriteLine("\n Çıkış yapıldı. Hoşça kalın!");
         }
 
-        // Tek bir komut işler. Programdan çıkılacaksa true döner.
         public static bool MainMenu()
         {
             Console.Clear();
